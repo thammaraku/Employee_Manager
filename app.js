@@ -1,5 +1,5 @@
 // Import package
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const inquirer = require('inquirer');
 
 // Connect database
@@ -16,9 +16,9 @@ connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
 
-    viewEmployees();
-    viewRoles();
-    viewDepartments();
+    // viewEmployees();
+    // viewRoles();
+    // viewDepartments();
   
 
     start();
@@ -27,7 +27,7 @@ connection.connect((err) => {
 
 // Inquirer part
 
-async function start() {
+function start() {
 
     inquirer
         .prompt({
@@ -42,7 +42,7 @@ async function start() {
                 "Remove Employee",
                 "Update Employee Role",
                 "Update Employee Manager",
-                "EXIT"
+                // "EXIT"
             ]
         })
 
@@ -55,25 +55,11 @@ async function start() {
                     connection.end();
                     break;
 
+                default:
+                    connection.end();
 
-
-
-
-            }
-
-
-
-
-
-
-
+            };
         });
-
-
-
-
-
-
 }
 
 
@@ -81,6 +67,6 @@ async function start() {
 // SQL QUERY PART
 async function viewEmployees() {
     const SQL_STATEMENT = "SELECT * FROM employee";
-    const [row, fields] = await connection.promise().query(SQL_STATEMENT);
+    const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
     console.table(rows);
 }

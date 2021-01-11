@@ -51,14 +51,16 @@ function start() {
             message: "What would you like to do?",
             loop: false,
             choices: [
-                "View All Employee",
+                "Add Department",
+                "Add Role",
+                "Add Employee",
+                "View All Departments",
+                "View All Roles",
+                "View All Employees",
+                "Update Employee Role",
                 "View All Employee By Department",
                 "View All Employee By Manager",
-                "Add Employee",
-                "Add Department",
                 "Remove Employee",
-                "Update Employee Role",
-                "Update Employee Manager",
                 "EXIT"
             ]
         })
@@ -67,8 +69,16 @@ function start() {
 
             switch (answers.userPick) {
 
-                case "View All Employee":
+                case "View All Employees":
                     viewEmployees();
+                    break;
+
+                case "View All Departments":
+                    viewDepartments();
+                    break;
+
+                case "View All Roles":
+                    viewRoles();
                     break;
 
                 case "View All Employee By Department":
@@ -81,6 +91,10 @@ function start() {
 
                 case "Add Employee":
                     addEmployee();
+                    break;
+
+                case "Add Role":
+                    addRole();
                     break;
 
                 case "Add Department":
@@ -123,6 +137,26 @@ async function viewEmployees() {
     connection.end();
 }
 
+async function viewDepartments() {
+    const SQL_STATEMENT = `SELECT * FROM department`;
+
+    const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
+    console.log("\t");
+    console.table(rows);
+    connection.end();
+}
+
+async function viewRoles() {
+    const SQL_STATEMENT = `SELECT role.id, title, salary, title, department.department
+    FROM (role 
+    INNER JOIN department 
+    ON role.department_id = department.id)`;
+
+    const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
+    console.log("\t");
+    console.table(rows);
+    connection.end();
+}
 
 async function viewByDepartment() {
 
@@ -247,7 +281,7 @@ async function addEmployee() {
             };
 
             var SQL_STATEMENT = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-            VALUES ("${answer.first_name}", "${answer.last_name}", 1, ${newManagerId})`;
+            VALUES ("${answer.first_name}", "${answer.last_name}", ${answer.role_id}, ${newManagerId})`;
 
             const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
 
@@ -263,6 +297,96 @@ async function addEmployee() {
             LEFT JOIN manager 
             ON employee.manager_id = manager.id)
             WHERE employee.first_name = "${answer.first_name}" AND employee.last_name = "${answer.last_name}"`;
+
+            const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
+            console.log("\t");
+            console.table(rows1);
+            connection.end();
+
+        });
+}
+
+async function addDepartment() {
+
+    inquirer
+        .prompt([
+            {
+                name: "department",
+                type: "input",
+                message: "what is the department name to add?"
+            }
+        ])
+
+        .then(async function (answer) {
+
+            var SQL_STATEMENT = `INSERT INTO department (department)
+            VALUES ("${answer.department}")`;
+
+            const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
+
+            console.log("\t");
+            console.log("Added new Department Below");
+
+            const SQL_STATEMENT_UPDATED = `SELECT id, department
+            FROM department
+            WHERE department.department = "${answer.department}"`;
+
+            const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
+            console.log("\t");
+            console.table(rows1);
+            connection.end();
+
+        });
+}
+
+async function addRole() {
+
+    const [departmentList, fields2] = await connection.promise().query(`SELECT * FROM department`);
+    // console.log(departmentList);
+
+    const departmentChoices = departmentList.map(({ id, department }) => ({
+        value: id, name: department
+    }));
+    // console.log(departmentChoices);
+
+    inquirer
+        .prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "what is the new role to add?"
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "How much is the salary?"
+            },
+            {
+                name: "department_id",
+                type: "list",
+                message: "What is the department of this role?",
+                choices: departmentChoices,
+                loop: false
+            }
+        ])
+
+        .then(async function (answer) {
+
+            // console.log(answer);
+
+            var SQL_STATEMENT = `INSERT INTO role (title, salary, department_id)
+            VALUES ("${answer.title}", ${answer.salary}, ${answer.department_id})`;
+
+            const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
+
+            console.log("\t");
+            console.log("Added new role below");
+
+            const SQL_STATEMENT_UPDATED = `SELECT role.id, title, salary, department.department
+            FROM (role
+            INNER JOIN department 
+            ON role.department_id = department.id) 
+            WHERE role.title = "${answer.title}" AND role.department_id = ${answer.department_id}`;
 
             const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
             console.log("\t");
@@ -289,7 +413,7 @@ async function removeEmployee() {
                 loop: false
             }
         ])
-        .then(async function(answer) {
+        .then(async function (answer) {
             // console.log(answer);
             var SQL_STATEMENT = `DELETE FROM employee WHERE id = ?`;
             const [rows, fields] = await connection.promise().query(SQL_STATEMENT, [answer.selectedRemoveEmployee]);

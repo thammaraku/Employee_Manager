@@ -5,7 +5,7 @@ CREATE DATABASE employeeDB;
 USE employeeDB;
 
 CREATE TABLE employee (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     role_id INT NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE employee (
 
 
 CREATE TABLE role (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(30) NOT NULL,
     salary DEC(10,0) NOT NULL,
     department_id INT NOT NULL
@@ -23,7 +23,7 @@ CREATE TABLE role (
 
 
 CREATE TABLE department (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     department VARCHAR(30) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -74,7 +74,7 @@ INNER JOIN role
 ON employee.role_id = role.id)
 INNER JOIN department
 ON role.department_id = department.id)
-WHERE department.department = "Sales"
+WHERE department.department = "Engineering"
 
 
 SELECT employee.id, first_name, last_name, title
@@ -87,4 +87,29 @@ ON employee.role_id = role.id
 
 -- ORDER BY top_album.year, top_album.position;  
 -- ORDER BY top1000.position, top_album.year;  
+
+
+SELECT employee.id, first_name, last_name, title, manager.manager, department.department
+FROM (((employee 
+INNER JOIN role 
+ON employee.role_id = role.id) 
+INNER JOIN department 
+ON role.department_id = department.id) 
+INNER JOIN manager 
+ON employee.manager_id = manager.id)
+
+
+UPDATE employee
+SET role_id = 7
+WHERE id = 1
+
+INSERT INTO employee
+VALUES
+
+
+INSERT INTO employee (first_name, last_name, role_id)
+VALUES ("Toby","Mac",8)
+            
+DELETE FROM employee
+WHERE id = 13
 

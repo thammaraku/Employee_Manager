@@ -182,9 +182,6 @@ async function addEmployee() {
     const roleWithId = roleList.map(({ id, title }) => ({
         value: id, name: `${title}`
     }));
-    // const [managerList, fields2] = await connection.promise().query("SELECT * FROM manager");
-    // const managerChoices = managerList.map(manager => manager.manager);
-    // console.log(managerList);
 
     inquirer
         .prompt([
@@ -204,53 +201,61 @@ async function addEmployee() {
                 choices: roleWithId,
                 loop: false
             }
-            // {
-            //     name: "manager_id",
-            //     type: "list",
-            //     message: "who is the employee's manager?",
-            //     choices: managerChoices,
-            //     loop: false
-            // }
         ])
 
         .then(async function (answer) {
 
-            // const SQL_STATEMENT = `INSERT INTO employee (first_name, last_name, role_id)
-            // VALUES ?`;
+            switch (answer.role_id) {
 
-            // const newEmployee = {
-            //     first_name: "Thamma",
-            //     last_name: "Uppa",
-            //     role_id: 1,
-            // ];
+                case 1:
+                    var newManagerId = 0;
+                    break;
+                case 2:
+                    var newManagerId = 1;
+                    break;
+                case 3:
+                    var newManagerId = 0;
+                    break;
+                case 4:
+                    var newManagerId = 3;
+                    break;
+                case 5:
+                    var newManagerId = 0;
+                    break;
+                case 6:
+                    var newManagerId = 5;
+                    break;
+                case 7:
+                    var newManagerId = 0;
+                    break;
+                case 8:
+                    var newManagerId = 7;
+                    break;
 
-            console.log(answer);
+            };
 
-            var query = `INSERT INTO employee SET ?`
-            // when finished prompting, insert a new item into the db with that info
-            connection.query(query,
-                {
-                    first_name: answer.first_name,
-                    last_name: answer.last_name,
-                    role_id: answer.role_id,
-                },
-                function (err, res) {
-                    if (err) throw err;
+            var SQL_STATEMENT = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+            VALUES ("${answer.first_name}", "${answer.last_name}", 1, ${newManagerId})`;
 
-                    console.table(res);
+            const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
 
-                    // console.log("newEmployee " + newEmployee);
+            console.log("\t");
+            console.log("Added new Employee Below");
 
-                    // const [rows, fields] = await connection.promise().query(SQL_STATEMENT, [newEmployee]);
-                    // console.log("\t");
-                    // console.table(rows3);
-                    // connection.end();
+            const SQL_STATEMENT_UPDATED = `SELECT employee.id, first_name, last_name, title, department.department, role.salary, manager.manager 
+            FROM (((employee 
+            INNER JOIN role 
+            ON employee.role_id = role.id) 
+            INNER JOIN department 
+            ON role.department_id = department.id) 
+            LEFT JOIN manager 
+            ON employee.manager_id = manager.id)
+            WHERE employee.first_name = "${answer.first_name}" AND employee.last_name = "${answer.last_name}"`;
 
-
-
-                });
-
-
+            const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
+            console.log("\t");
+            console.table(rows1);
+            connection.end();
 
         });
 }
@@ -258,85 +263,85 @@ async function addEmployee() {
 
 async function updateRole() {
 
-                const [employeeList, fields1] = await connection.promise().query("SELECT * FROM employee");
-                // console.log(employeeList);
-                const employeeIdFirstSecond = employeeList.map(({ id, first_name, last_name }) => ({
-                    value: id, name: `${first_name} ${last_name}`
-                }));
-                // console.log(employeeIdFirstSecond);
-                const [roleList, fields2] = await connection.promise().query("SELECT * FROM role");
-                // console.log(roleList);
-                const roleWithId = roleList.map(({ id, title }) => ({
-                    value: id, name: `${title}`
-                }));
+    const [employeeList, fields1] = await connection.promise().query("SELECT * FROM employee");
+    // console.log(employeeList);
+    const employeeIdFirstSecond = employeeList.map(({ id, first_name, last_name }) => ({
+        value: id, name: `${first_name} ${last_name}`
+    }));
+    // console.log(employeeIdFirstSecond);
+    const [roleList, fields2] = await connection.promise().query("SELECT * FROM role");
+    // console.log(roleList);
+    const roleWithId = roleList.map(({ id, title }) => ({
+        value: id, name: `${title}`
+    }));
 
-                inquirer
-                    .prompt([
-                        {
-                            name: "roleChangeEmployee",
-                            type: "list",
-                            message: "which person would you like to change role?",
-                            // choices: employeeList.map(employee => employee.first_name)
-                            choices: employeeIdFirstSecond,
-                            loop: false
-                        },
-                        {
-                            name: "newRole",
-                            type: "list",
-                            message: "which role would you like to change to?",
-                            choices: roleWithId,
-                            loop: false
-                        }
-                    ])
-                    .then(async function (answer) {
-                        // console.log("answer.newRole " + answer.newRole);
-                        // console.log("answer.roleChangeEmployee " + answer.roleChangeEmployee);
+    inquirer
+        .prompt([
+            {
+                name: "roleChangeEmployee",
+                type: "list",
+                message: "which person would you like to change role?",
+                // choices: employeeList.map(employee => employee.first_name)
+                choices: employeeIdFirstSecond,
+                loop: false
+            },
+            {
+                name: "newRole",
+                type: "list",
+                message: "which role would you like to change to?",
+                choices: roleWithId,
+                loop: false
+            }
+        ])
+        .then(async function (answer) {
+            // console.log("answer.newRole " + answer.newRole);
+            // console.log("answer.roleChangeEmployee " + answer.roleChangeEmployee);
 
-                        const SQL_STATEMENT = `UPDATE employee
+            const SQL_STATEMENT = `UPDATE employee
             SET role_id = ?
             WHERE id = ?`;
 
-                        const [rows, fields] = await connection.promise().query(SQL_STATEMENT, [answer.newRole, answer.roleChangeEmployee]);
+            const [rows, fields] = await connection.promise().query(SQL_STATEMENT, [answer.newRole, answer.roleChangeEmployee]);
 
-                        switch (answer.newRole) {
+            switch (answer.newRole) {
 
-                            case 1:
-                                var newManagerId = 0;
-                                break;
-                            case 2:
-                                var newManagerId = 1;
-                                break;
-                            case 3:
-                                var newManagerId = 0;
-                                break;
-                            case 4:
-                                var newManagerId = 3;
-                                break;
-                            case 5:
-                                var newManagerId = 0;
-                                break;
-                            case 6:
-                                var newManagerId = 5;
-                                break;
-                            case 7:
-                                var newManagerId = 0;
-                                break;
-                            case 8:
-                                var newManagerId = 7;
-                                break;
+                case 1:
+                    var newManagerId = 0;
+                    break;
+                case 2:
+                    var newManagerId = 1;
+                    break;
+                case 3:
+                    var newManagerId = 0;
+                    break;
+                case 4:
+                    var newManagerId = 3;
+                    break;
+                case 5:
+                    var newManagerId = 0;
+                    break;
+                case 6:
+                    var newManagerId = 5;
+                    break;
+                case 7:
+                    var newManagerId = 0;
+                    break;
+                case 8:
+                    var newManagerId = 7;
+                    break;
 
-                        };
-                        // console.log("newManagerId " + newManagerId);
-                        // console.log("answer.roleChangeEmployee " + answer.roleChangeEmployee);
+            };
+            // console.log("newManagerId " + newManagerId);
+            // console.log("answer.roleChangeEmployee " + answer.roleChangeEmployee);
 
-                        const SQL_STATEMENT_MANAGER = `UPDATE employee
+            const SQL_STATEMENT_MANAGER = `UPDATE employee
             SET manager_id = "${newManagerId}"
             WHERE id = "${answer.roleChangeEmployee}"`;
-                        const [rows2, fields2] = await connection.promise().query(SQL_STATEMENT_MANAGER);
-                        console.log("\t");
-                        console.log("Updated Employee Role Below");
+            const [rows2, fields2] = await connection.promise().query(SQL_STATEMENT_MANAGER);
+            console.log("\t");
+            console.log("Updated Employee Role Below");
 
-                        const SQL_STATEMENT_UPDATED = `SELECT employee.id, first_name, last_name, title, department.department, role.salary, manager.manager 
+            const SQL_STATEMENT_UPDATED = `SELECT employee.id, first_name, last_name, title, department.department, role.salary, manager.manager 
             FROM (((employee 
             INNER JOIN role 
             ON employee.role_id = role.id) 
@@ -346,19 +351,19 @@ async function updateRole() {
             ON employee.manager_id = manager.id)
             WHERE employee.id = "${answer.roleChangeEmployee}"`;
 
-                        const [rows3, fields3] = await connection.promise().query(SQL_STATEMENT_UPDATED);
-                        console.log("\t");
-                        console.table(rows3);
-                        connection.end();
+            const [rows3, fields3] = await connection.promise().query(SQL_STATEMENT_UPDATED);
+            console.log("\t");
+            console.table(rows3);
+            connection.end();
 
 
-                    })
+        })
 
 
 
 
 
-            }
+}
 
 // function searchDepartment() {
 

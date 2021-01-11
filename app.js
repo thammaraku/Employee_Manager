@@ -1,3 +1,5 @@
+///////////////////////////////////////////////// DEPENDENCIES AND CONNECTION ///////////////////////////////////////////////////////
+
 // Import package
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
@@ -21,7 +23,7 @@ connection.connect((err) => {
 
 });
 
-// Inquirer part
+///////////////////////////////////////////////// INIT FUNCTION ///////////////////////////////////////////////////////
 
 function start() {
 
@@ -53,6 +55,7 @@ function start() {
                 "View All Employee By Department",
                 "View All Employee By Manager",
                 "Add Employee",
+                "Add Department",
                 "Remove Employee",
                 "Update Employee Role",
                 "Update Employee Manager",
@@ -80,6 +83,14 @@ function start() {
                     addEmployee();
                     break;
 
+                case "Add Department":
+                    addDepartment();
+                    break;
+
+                case "Remove Employee":
+                    removeEmployee();
+                    break;
+
                 case "Update Employee Role":
                     updateRole();
                     break;
@@ -94,7 +105,8 @@ function start() {
 
 
 
-// SQL QUERY PART
+///////////////////////////////////////////////// SQL QUERY PART ///////////////////////////////////////////////////////
+
 async function viewEmployees() {
     const SQL_STATEMENT = `SELECT employee.id, first_name, last_name, title, department.department, role.salary, manager.manager 
     FROM (((employee 
@@ -260,6 +272,46 @@ async function addEmployee() {
         });
 }
 
+async function removeEmployee() {
+
+    const [employeeList, fields1] = await connection.promise().query("SELECT * FROM employee");
+    const employeeIdFirstSecond = employeeList.map(({ id, first_name, last_name }) => ({
+        value: id, name: `${first_name} ${last_name}`
+    }));
+
+    inquirer
+        .prompt([
+            {
+                name: "selectedRemoveEmployee",
+                type: "list",
+                message: "Which employee would you like to remove?",
+                choices: employeeIdFirstSecond,
+                loop: false
+            }
+        ])
+        .then(async function(answer) {
+            // console.log(answer);
+            var SQL_STATEMENT = `DELETE FROM employee WHERE id = ?`;
+            const [rows, fields] = await connection.promise().query(SQL_STATEMENT, [answer.selectedRemoveEmployee]);
+            console.log("\t");
+            console.log("Removed selected employee. Here's the updated table");
+
+            const SQL_STATEMENT_UPDATED = `SELECT employee.id, first_name, last_name, title, department.department, role.salary, manager.manager 
+            FROM (((employee 
+            INNER JOIN role 
+            ON employee.role_id = role.id) 
+            INNER JOIN department 
+            ON role.department_id = department.id) 
+            LEFT JOIN manager 
+            ON employee.manager_id = manager.id)`;
+
+            const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
+            console.log("\t");
+            console.table(rows1);
+            connection.end();
+        })
+}
+
 
 async function updateRole() {
 
@@ -355,14 +407,7 @@ async function updateRole() {
             console.log("\t");
             console.table(rows3);
             connection.end();
-
-
         })
-
-
-
-
-
 }
 
 // function searchDepartment() {

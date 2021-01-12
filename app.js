@@ -119,7 +119,7 @@ function start() {
 
 
 
-///////////////////////////////////////////////// SQL QUERY PART ///////////////////////////////////////////////////////
+///////////////////////////////////////////////// SQL QUERIES ///////////////////////////////////////////////////////
 
 async function viewEmployees() {
     const SQL_STATEMENT = `SELECT employee.id, first_name, last_name, title, department.department, role.salary, manager.manager 
@@ -134,7 +134,7 @@ async function viewEmployees() {
     const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
     console.log("\t");
     console.table(rows);
-    connection.end();
+    start();
 }
 
 async function viewDepartments() {
@@ -143,7 +143,7 @@ async function viewDepartments() {
     const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
     console.log("\t");
     console.table(rows);
-    connection.end();
+    start();
 }
 
 async function viewRoles() {
@@ -155,7 +155,7 @@ async function viewRoles() {
     const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
     console.log("\t");
     console.table(rows);
-    connection.end();
+    start();
 }
 
 async function viewByDepartment() {
@@ -184,7 +184,7 @@ async function viewByDepartment() {
             const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
             console.log("\t");
             console.table(rows);
-            connection.end();
+            start();
         });
 }
 
@@ -216,7 +216,7 @@ async function viewByManager() {
             const [rows, fields] = await connection.promise().query(SQL_STATEMENT);
             console.log("\t");
             console.table(rows);
-            connection.end();
+            start();
         });
 }
 
@@ -301,7 +301,7 @@ async function addEmployee() {
             const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
             console.log("\t");
             console.table(rows1);
-            connection.end();
+            start();
 
         });
 }
@@ -334,7 +334,7 @@ async function addDepartment() {
             const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
             console.log("\t");
             console.table(rows1);
-            connection.end();
+            start();
 
         });
 }
@@ -391,7 +391,7 @@ async function addRole() {
             const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
             console.log("\t");
             console.table(rows1);
-            connection.end();
+            start();
 
         });
 }
@@ -432,7 +432,7 @@ async function removeEmployee() {
             const [rows1, fields1] = await connection.promise().query(SQL_STATEMENT_UPDATED);
             console.log("\t");
             console.table(rows1);
-            connection.end();
+            start();
         })
 }
 
@@ -530,35 +530,9 @@ async function updateRole() {
             const [rows3, fields3] = await connection.promise().query(SQL_STATEMENT_UPDATED);
             console.log("\t");
             console.table(rows3);
-            connection.end();
+            start();
         })
 }
-
-// function searchDepartment() {
-
-//     inquirer
-//         .prompt({
-//             name: "departmentSelect",
-//             type: "list",
-//             message: "Which department would you like to search?",
-//             choices: [
-//                 "Sales",
-//                 "Engineering",
-//                 "Finance",
-//                 "Add Employee",
-//                 "Legal"
-//             ]
-//         })
-
-//         .then(function(answer) {
-//             console.log(answer);
-//             console.log(answer.departmentSelect);
-//             const departmentSelect = answer.departmentSelect;
-//             viewEmployeesDepartment(departmentSelect)
-//         });
-// }
-
-
 
 
 // ######### BACKUP CODE ###########

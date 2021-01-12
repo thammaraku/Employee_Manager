@@ -16,14 +16,16 @@ To architect and build a solution for managing a company's employees using node,
   * View the total utilized budget of a department -- ie the combined salaries of all employees in that department
 
 
+
 ## Application
 
 ### Github Repository URL
-https://github.com/thammaraku/homework_11_employee_trackers
+https://github.com/thammaraku/homework_11_employee_tracker
 ### Application Screenshot
 ![Application Screenshot](./assets/employee_tracker.gif)
 ### Tutorial Video Link
 https://drive.google.com/file/d/1qxNqydiStuOPSKAvcExYGyTlE93gTM6T/view?usp=sharing
+
 
 
 ## Knowledge learned from this assignment

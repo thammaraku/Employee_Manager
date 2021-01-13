@@ -24,3 +24,8 @@ INSERT INTO department (department) values('Sales');
 INSERT INTO department (department) values('Engineering');
 INSERT INTO department (department) values('Finance');
 INSERT INTO department (department) values('Legal');
+
+INSERT INTO manager (id, manager) values(1, 'John Doe');
+INSERT INTO manager (id, manager) values(3, 'Ashley Rodriguez');
+INSERT INTO manager (id, manager) values(5, 'Kunal Singh');
+INSERT INTO manager (id, manager) values(7, 'Sarah Lourd');
